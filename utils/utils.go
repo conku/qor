@@ -402,18 +402,18 @@ func SafeJoin(paths ...string) (string, error) {
 	return result, nil
 }
 
-func ModelStructs(modelStruct interface{}) *admin.Section {
-	section := &admin.Section{}
-	scope := DefaultAdmin.NewScope(modelStruct)
-	results := reflect.New(reflect.SliceOf(scope.GetModelStruct().Type)).Interface()
+// func ModelStructs(modelStruct interface{}) *admin.Section {
+// 	section := &admin.Section{}
+// 	scope := DefaultAdmin.NewScope(modelStruct)
+// 	results := reflect.New(reflect.SliceOf(scope.GetModelStruct().Type)).Interface()
 
-	DefaultAdmin.DB.Find(results)
-	section.Rows = [][]*admin.Section{{{
-		Struct: modelStruct,
-		Label:  "Result",
-	}}}
-	for _, record := range reflect.ValueOf(results).Elem().Slice() {
-		section.Rows[0] = append(section.Rows[0], &admin.Section{Struct: record.Interface()})
-	}
-	return section
-}
+// 	DefaultAdmin.DB.Find(results)
+// 	section.Rows = [][]*admin.Section{{{
+// 		Struct: modelStruct,
+// 		Label:  "Result",
+// 	}}}
+// 	for _, record := range reflect.ValueOf(results).Elem().Slice() {
+// 		section.Rows[0] = append(section.Rows[0], &admin.Section{Struct: record.Interface()})
+// 	}
+// 	return section
+// }
