@@ -1,6 +1,6 @@
 // Copyright 2021 Tencent Inc. All rights reserved.
 
-package utils
+package core
 
 import "time"
 
