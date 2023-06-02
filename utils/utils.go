@@ -95,7 +95,8 @@ func ToParamString(str string) string {
 }
 
 // PatchURL updates the query part of the request url.
-//     PatchURL("google.com","key","value") => "google.com?key=value"
+//
+//	PatchURL("google.com","key","value") => "google.com?key=value"
 func PatchURL(originalURL string, params ...interface{}) (patchedURL string, err error) {
 	url, err := url.Parse(originalURL)
 	if err != nil {
@@ -121,8 +122,9 @@ func PatchURL(originalURL string, params ...interface{}) (patchedURL string, err
 }
 
 // JoinURL updates the path part of the request url.
-//     JoinURL("google.com", "admin") => "google.com/admin"
-//     JoinURL("google.com?q=keyword", "admin") => "google.com/admin?q=keyword"
+//
+//	JoinURL("google.com", "admin") => "google.com/admin"
+//	JoinURL("google.com?q=keyword", "admin") => "google.com/admin?q=keyword"
 func JoinURL(originalURL string, paths ...interface{}) (joinedURL string, err error) {
 	u, err := url.Parse(originalURL)
 	if err != nil {
@@ -261,9 +263,10 @@ func filenameWithLineNum() string {
 
 // GetLocale get locale from request, cookie, after get the locale, will write the locale to the cookie if possible
 // Overwrite the default logic with
-//     utils.GetLocale = func(context *qor.Context) string {
-//         // ....
-//     }
+//
+//	utils.GetLocale = func(context *qor.Context) string {
+//	    // ....
+//	}
 var GetLocale = func(context *qor.Context) string {
 	if locale := context.Request.Header.Get("Locale"); locale != "" {
 		return locale
@@ -286,18 +289,20 @@ var GetLocale = func(context *qor.Context) string {
 
 // ParseTime parse time from string
 // Overwrite the default logic with
-//     utils.ParseTime = func(timeStr string, context *qor.Context) (time.Time, error) {
-//         // ....
-//     }
+//
+//	utils.ParseTime = func(timeStr string, context *qor.Context) (time.Time, error) {
+//	    // ....
+//	}
 var ParseTime = func(timeStr string, context *qor.Context) (time.Time, error) {
 	return now.Parse(timeStr)
 }
 
 // FormatTime format time to string
 // Overwrite the default logic with
-//     utils.FormatTime = func(time time.Time, format string, context *qor.Context) string {
-//         // ....
-//     }
+//
+//	utils.FormatTime = func(time time.Time, format string, context *qor.Context) string {
+//	    // ....
+//	}
 var FormatTime = func(date time.Time, format string, context *qor.Context) string {
 	return date.Format(format)
 }
@@ -395,4 +400,20 @@ func SafeJoin(paths ...string) (string, error) {
 	}
 
 	return result, nil
+}
+
+func ModelStructs(modelStruct interface{}) *admin.Section {
+	section := &admin.Section{}
+	scope := DefaultAdmin.NewScope(modelStruct)
+	results := reflect.New(reflect.SliceOf(scope.GetModelStruct().Type)).Interface()
+
+	DefaultAdmin.DB.Find(results)
+	section.Rows = [][]*admin.Section{{{
+		Struct: modelStruct,
+		Label:  "Result",
+	}}}
+	for _, record := range reflect.ValueOf(results).Elem().Slice() {
+		section.Rows[0] = append(section.Rows[0], &admin.Section{Struct: record.Interface()})
+	}
+	return section
 }
