@@ -17,9 +17,9 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/conku/now"
 	"github.com/conku/qor"
 	"github.com/gosimple/slug"
+	"github.com/jinzhu/now"
 	"github.com/microcosm-cc/bluemonday"
 	"gorm.io/gorm"
 
