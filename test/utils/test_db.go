@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/conku/gorm"
 	_ "github.com/go-sql-driver/mysql"
 	_ "github.com/lib/pq"
+	"gorm.io/gorm"
 )
 
 // TestDB initialize a db for testing

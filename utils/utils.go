@@ -14,13 +14,14 @@ import (
 	"runtime"
 	"runtime/debug"
 	"sort"
+	"strconv"
 	"time"
 
-	"github.com/conku/gorm"
 	"github.com/conku/now"
 	"github.com/conku/qor"
 	"github.com/gosimple/slug"
 	"github.com/microcosm-cc/bluemonday"
+	"gorm.io/gorm"
 
 	"strings"
 )
@@ -417,3 +418,153 @@ func SafeJoin(paths ...string) (string, error) {
 // 	}
 // 	return section
 // }
+
+// ToArray get array from value, will ignore blank string to convert it to array
+func ToArray(value interface{}) (values []string) {
+	switch value := value.(type) {
+	case []string:
+		values = []string{}
+		for _, v := range value {
+			if v != "" {
+				values = append(values, v)
+			}
+		}
+	case []interface{}:
+		for _, v := range value {
+			values = append(values, fmt.Sprint(v))
+		}
+	default:
+		if value := fmt.Sprint(value); value != "" {
+			values = []string{value}
+		}
+	}
+	return
+}
+
+// ToString get string from value, if passed value is a slice, will use the first element
+func ToString(value interface{}) string {
+	if v, ok := value.([]string); ok {
+		for _, s := range v {
+			if s != "" {
+				return s
+			}
+		}
+		return ""
+	} else if v, ok := value.(string); ok {
+		return v
+	} else if v, ok := value.([]interface{}); ok {
+		for _, s := range v {
+			if fmt.Sprint(s) != "" {
+				return fmt.Sprint(s)
+			}
+		}
+		return ""
+	}
+	return fmt.Sprintf("%v", value)
+}
+
+// ToInt get int from value, if passed value is empty string, result will be 0
+func ToInt(value interface{}) int64 {
+	if result := ToString(value); result == "" {
+		return 0
+	} else if i, err := strconv.ParseInt(result, 10, 64); err == nil {
+		return i
+	} else {
+		panic("failed to parse int: " + result)
+	}
+}
+
+// ToUint get uint from value, if passed value is empty string, result will be 0
+func ToUint(value interface{}) uint64 {
+	if result := ToString(value); result == "" {
+		return 0
+	} else if i, err := strconv.ParseUint(result, 10, 64); err == nil {
+		return i
+	} else {
+		panic("failed to parse uint: " + result)
+	}
+}
+
+// ToFloat get float from value, if passed value is empty string, result will be 0
+func ToFloat(value interface{}) float64 {
+
+	if result := ToString(value); result == "" || result == "NaN" {
+		return 0
+	} else if i, err := strconv.ParseFloat(result, 64); err == nil {
+		return i
+	} else {
+		return 0
+	}
+}
+
+// GetParm 获取Parms参数
+func GetParm(urls, parmname string) string {
+	parm, _ := regexp.Compile("(^|&)" + parmname + "=([^&]*)(&|$)")
+	parms := parm.FindAllSubmatch([]byte(urls), -1)
+	if len(parms) > 0 {
+		return string(parms[0][1])
+	} else {
+		return ""
+	}
+}
+
+// 截取字符串 start 起点下标 length 需要截取的长度
+func SubString(str string, start int, length int) string {
+	rs := []rune(str)
+	rl := len(rs)
+	end := 0
+
+	if start < 0 {
+		start = rl - 1 + start
+	}
+	end = start + length
+
+	if start > end {
+		start, end = end, start
+	}
+
+	if start < 0 {
+		start = 0
+	}
+	if start > rl {
+		start = rl
+	}
+	if end < 0 {
+		end = 0
+	}
+	if end > rl {
+		end = rl
+	}
+
+	return string(rs[start:end])
+}
+
+func ParseBool(str string) bool {
+	switch str {
+	case "1", "t", "T", "true", "TRUE", "True":
+		return true
+	case "0", "f", "F", "false", "FALSE", "False":
+		return false
+	}
+	return false
+}
+
+func FormatBool(b bool) string {
+	if b {
+		return "true"
+	}
+	return "false"
+}
+
+// ToDateTime 转换为日期时间
+func ToDateTime(timestamp int64) time.Time {
+
+	tm := time.Unix(timestamp, 0)
+
+	//2021-03-25T16:28:46Z
+	//	var timeLayoutStr = "2006-01-02 15:04:05" //go中的时间格式化必须是这个时间
+	//ts, _ := time.Parse(timeLayoutStr, ToString(value))
+
+	//stamp, _ := time.ParseInLocation(timeLayoutStr, ToString(value), time.Local)
+	return tm
+}

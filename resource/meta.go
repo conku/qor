@@ -8,11 +8,11 @@ import (
 	"strings"
 	"time"
 
-	"github.com/conku/gorm"
 	"github.com/conku/qor"
 	"github.com/conku/qor/utils"
 	"github.com/conku/roles"
 	"github.com/conku/validations"
+	"gorm.io/gorm"
 )
 
 // Metaor interface

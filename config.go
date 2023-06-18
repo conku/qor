@@ -1,6 +1,6 @@
 package qor
 
-import "github.com/conku/gorm"
+import "gorm.io/gorm"
 
 // Config qor config struct
 type Config struct {

@@ -3,7 +3,7 @@ package qor
 import (
 	"net/http"
 
-	"github.com/conku/gorm"
+	"gorm.io/gorm"
 )
 
 // CurrentUser is an interface, which is used for qor admin to get current logged user
